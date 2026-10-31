@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Прохождение методик отбора операторов БПЛА</title>
+  <style>
+    :root{--bg:#f5f7fa;--panel:#fff;--ink:#1d2733;--muted:#667085;--line:#d8dee8;--accent:#1f6f78;--warn:#9a5b00;--bad:#a23b3b;--good:#177245}
+    *{box-sizing:border-box} body{margin:0;background:var(--bg);font-family:Arial,Helvetica,sans-serif;color:var(--ink);line-height:1.45}
+    header{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+    .top{max-width:1160px;margin:0 auto;padding:14px 18px;display:flex;justify-content:space-between;gap:14px;align-items:center}
+    h1{font-size:20px;margin:0}.sub{font-size:13px;color:var(--muted);margin:2px 0 0}
+    main{max-width:1160px;margin:0 auto;padding:20px 18px 42px;display:grid;grid-template-columns:280px 1fr;gap:18px}
+    nav,section{background:var(--panel);border:1px solid var(--line);border-radius:8px}
+    nav{padding:12px;position:sticky;top:78px;align-self:start}.stepbtn{display:block;width:100%;text-align:left;margin:6px 0;padding:10px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink);cursor:pointer}.stepbtn.active{border-color:var(--accent);background:#edf7f8;font-weight:700}
+    section{padding:18px;display:none}section.active{display:block}h2{font-size:18px;margin:0 0 12px}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.field label{font-size:13px;font-weight:700;color:#344054;display:block;margin-bottom:5px}
+    input,select,textarea{width:100%;border:1px solid var(--line);border-radius:6px;padding:10px;font:inherit;background:#fff}textarea{min-height:80px;resize:vertical}
+    .notice{background:#fff7e8;border-left:4px solid var(--warn);border-radius:6px;padding:11px 12px;margin:12px 0;font-size:13px}.ok{color:var(--good);font-weight:700}.bad{color:var(--bad);font-weight:700}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}button{border:1px solid transparent;border-radius:6px;background:var(--accent);color:#fff;font-weight:700;min-height:40px;padding:10px 13px;cursor:pointer}button.secondary{background:#fff;color:var(--accent);border-color:var(--accent)}button.ghost{background:#fff;color:#344054;border-color:var(--line)}button:disabled{opacity:.45;cursor:not-allowed}
+    .cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.card{border:1px solid var(--line);border-radius:8px;padding:12px;background:#fbfcfd}.big{font-size:24px;font-weight:700;color:var(--accent)}
+    .schulte,.gorbov,.bourdon{display:grid;gap:6px;margin-top:14px}.schulte{grid-template-columns:repeat(5,64px)}.gorbov{grid-template-columns:repeat(7,58px)}.cell{height:52px;border:1px solid #b8c4d3;border-radius:6px;background:#f9fbfd;color:#172033!important;font-size:22px;font-weight:800;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;padding:0;line-height:1;text-align:center;box-shadow:inset 0 -1px 0 rgba(28,39,51,.08)}.cell:hover{background:#eef7f8;border-color:var(--accent)}.cell.done{background:#dcebe3;color:#526171!important}.red{color:#b42318!important}.black{color:#111827!important}
+    .bourdon{grid-template-columns:repeat(25,34px)}.letter{height:34px;border:1px solid #b8c4d3;border-radius:4px;background:#f9fbfd;color:#172033!important;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:800;font-size:18px;padding:0;line-height:1;text-align:center;box-shadow:inset 0 -1px 0 rgba(28,39,51,.08)}.letter:hover{background:#eef7f8;border-color:var(--accent)}.letter.sel{background:#cdecef!important;border-color:var(--accent);color:#0f5961!important}.letter.miss{background:#fdeaea!important;color:#a23b3b!important}.letter.wrong{background:#fff0d4!important;color:#8a4a00!important}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.tab{background:#fff;color:var(--accent);border:1px solid var(--accent)}.tab.active{background:var(--accent);color:#fff}.qwrap{display:grid;gap:10px}.qcard{border:1px solid var(--line);border-radius:8px;background:#fbfcfd;padding:12px}.qtext{font-weight:700;margin-bottom:10px}.answers{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.answers.two{grid-template-columns:repeat(2,minmax(0,1fr))}.ans{background:#fff!important;color:#172033!important;border:1px solid #b8c4d3!important;border-radius:6px;min-height:42px;padding:8px 10px;font-weight:700}.ans.active{background:#cdecef!important;border-color:var(--accent)!important;color:#0f5961!important}.qstat{display:flex;justify-content:space-between;gap:10px;align-items:center;color:var(--muted);font-size:13px;margin:8px 0}.qsummary{margin-top:12px}.source{font-size:12px;color:var(--muted);margin-top:8px}
+    .signal{height:220px;border:1px solid var(--line);border-radius:8px;background:#eef2f6;display:flex;align-items:center;justify-content:center;text-align:center;font-size:22px;font-weight:700;margin-top:14px;cursor:pointer}.signal.go{background:#dff3f5;color:#0f5961}.signal.wait{background:#f2f4f7;color:#667085}
+    table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}td,th{border:1px solid var(--line);padding:8px;text-align:left}th{background:#f1f4f7}
+    @media(max-width:850px){main{grid-template-columns:1fr}nav{position:static}.cards,.grid{grid-template-columns:1fr}.schulte{grid-template-columns:repeat(5,1fr)}.gorbov{grid-template-columns:repeat(7,1fr)}.bourdon{grid-template-columns:repeat(10,1fr)}}
+  </style>
+</head>
+<body>
+<header><div class="top"><div><h1>Прохождение батареи методик</h1><p class="sub">Формирует файл результатов для последующей загрузки психологом</p></div><span id="progress" class="sub">0% готово</span></div></header>
+<main>
+  <nav id="nav"></nav>
+  <div>
+    <section id="s0" class="active">
+      <h2>1. Регистрация</h2>
+      <div class="grid">
+        <div class="field"><label>Фамилия, инициалы или код</label><input id="candidateName"></div>
+        <div class="field"><label>Дата обследования</label><input id="examDate" type="date"></div>
+        <div class="field"><label>Возраст</label><input id="age" type="number" min="16" max="65"></div>
+        <div class="field"><label>Подразделение / группа</label><input id="group"></div>
+        <div class="field"><label>Опыт работы с техникой</label><select id="experience"><option>Не указан</option><option>Отсутствует</option><option>Небольшой</option><option>Средний</option><option>Выраженный</option></select></div>
+        <div class="field"><label>Опыт управления БПЛА</label><select id="uavExperience"><option>Не указан</option><option>Отсутствует</option><option>Учебный</option><option>Практический</option><option>Значительный</option></select></div>
+      </div>
+      <div class="notice">Перед началом убедитесь, что испытуемый понял инструкцию, находится в спокойных условиях и не отвлекается.</div>
+      <div class="actions"><button onclick="next()">Начать</button></div>
+    </section>
+
+    <section id="s1">
+      <h2>2. Айзенк EPI и Спилбергер - Ханин STAI</h2>
+      <div class="notice">Ответьте на все утверждения. Расчет выполняется автоматически: EPI дает нейротизм, эмоциональную устойчивость и шкалу искренности; STAI дает ситуативную и личностную тревожность.</div>
+      <div class="tabs"><button id="tabEpi" class="tab active" onclick="showQuestionnaire('epi')">EPI Айзенка</button><button id="tabStai" class="tab" onclick="showQuestionnaire('stai')">STAI Спилбергера - Ханина</button></div>
+      <div class="qstat"><span id="questionnaireStatus">Заполнено: 0 из 97</span><span id="questionnaireResult">Результаты появятся после заполнения</span></div>
+      <div id="epiBox" class="qwrap"></div>
+      <div id="staiBox" class="qwrap" style="display:none"></div>
+      <div id="questionnaireSummary" class="qsummary"></div>
+      <div class="source">Источник стимульного материала: psytests.org, страницы EPI Айзенка и STAI Спилбергера-Ханина.</div>
+      <div class="actions"><button class="secondary" onclick="prev()">Назад</button><button id="questionnaireNextBtn" onclick="finishQuestionnaires()" disabled>Далее</button></div>
+    </section>
+
+    <section id="s2">
+      <h2>3. Таблицы Шульте: концентрация внимания</h2>
+      <p>Нажимайте числа от 1 до 25 по порядку как можно быстрее и без ошибок.</p>
+      <div class="cards"><div class="card">Следующее число<div id="schulteNext" class="big">1</div></div><div class="card">Время<div id="schulteTime" class="big">0.0</div></div><div class="card">Ошибки<div id="schulteErrors" class="big">0</div></div></div>
+      <div id="schulteGrid" class="schulte"></div>
+      <div class="actions"><button onclick="startSchulte()">Начать / заново</button><button class="secondary" onclick="prev()">Назад</button><button id="schulteNextBtn" onclick="next()" disabled>Далее</button></div>
+    </section>
+
+    <section id="s3">
+      <h2>4. Корректурная проба Бурдона: устойчивость внимания</h2>
+      <p>За 90 секунд отметьте все буквы <strong>К</strong> и <strong>Р</strong>. Ошибочные отметки снижают результат.</p>
+      <div class="cards"><div class="card">Осталось<div id="bourdonLeft" class="big">90</div></div><div class="card">Отмечено<div id="bourdonSelected" class="big">0</div></div><div class="card">Точность<div id="bourdonAcc" class="big">-</div></div></div>
+      <div id="bourdonGrid" class="bourdon"></div>
+      <div class="actions"><button onclick="startBourdon()">Начать</button><button class="secondary" onclick="prev()">Назад</button><button id="bourdonNextBtn" onclick="next()" disabled>Далее</button></div>
+    </section>
+
+    <section id="s4">
+      <h2>5. Горбов - Шульте: переключение внимания</h2>
+      <p>Нажимайте попеременно: черное 1, красное 24, черное 2, красное 23 и так далее.</p>
+      <div class="cards"><div class="card">Следующая цель<div id="gorbovNext" class="big">-</div></div><div class="card">Время<div id="gorbovTime" class="big">0.0</div></div><div class="card">Ошибки<div id="gorbovErrors" class="big">0</div></div></div>
+      <div id="gorbovGrid" class="gorbov"></div>
+      <div class="actions"><button onclick="startGorbov()">Начать / заново</button><button class="secondary" onclick="prev()">Назад</button><button id="gorbovNextBtn" onclick="next()" disabled>Далее</button></div>
+    </section>
+
+    <section id="s5">
+      <h2>6. Компьютерный тест скорости сенсомоторной реакции</h2>
+      <p>Нажимайте на область только после появления сигнала. Преждевременные нажатия учитываются как импульсивные реакции.</p>
+      <div class="cards"><div class="card">Попытка<div id="reactionTrial" class="big">0/20</div></div><div class="card">Среднее время<div id="reactionMean" class="big">-</div></div><div class="card">Фальстарты<div id="reactionFalse" class="big">0</div></div></div>
+      <div id="signal" class="signal wait">Нажмите «Начать тест»</div>
+      <div class="actions"><button onclick="startReaction()">Начать тест</button><button class="secondary" onclick="prev()">Назад</button><button id="reactionNextBtn" onclick="next()" disabled>Далее</button></div>
+    </section>
+
+    <section id="s6">
+      <h2>7. Сохранение файла результатов</h2>
+      <p>Проверьте сводку и сохраните файл. Этот файл затем выбирает психолог во второй программе для формирования заключения.</p>
+      <div id="summary"></div>
+      <div class="actions"><button onclick="saveResults()">Сохранить файл результатов</button><button class="secondary" onclick="prev()">Назад</button></div>
+    </section>
+  </div>
+</main>
+<script>
+const steps=['Регистрация','Айзенк / Спилбергер','Шульте','Бурдон','Горбов - Шульте','Реакция','Сохранение'];
+let current=0, done={}, timers={}, results={tasks:{}};
+function $(id){return document.getElementById(id)}
+function clamp(v){return Math.max(1,Math.min(5,Number(v)||3))}
+function levelDirect(v){return clamp(v)}
+function levelByTime(sec, cuts){return sec<=cuts[0]?5:sec<=cuts[1]?4:sec<=cuts[2]?3:sec<=cuts[3]?2:1}
+function renderNav(){let n=$('nav');n.innerHTML='';steps.forEach((s,i)=>{let b=document.createElement('button');b.className='stepbtn '+(i===current?'active':'');b.textContent=(i+1)+'. '+s;b.onclick=()=>show(i);n.appendChild(b)});updateProgress()}
+function updateProgress(){let count=Object.keys(done).length;$('progress').textContent=Math.round(count/5*100)+'% готово'}
+function show(i){if(i!==2&&schulte.running)resetSchulte();if(i!==4&&gorbov.running)resetGorbov();current=i;document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));$('s'+i).classList.add('active');if(i===6)renderSummary();renderNav()}
+function next(){show(Math.min(6,current+1))} function prev(){show(Math.max(0,current-1))}
+function markDone(k){done[k]=true;updateProgress()}
+function shuffle(a){return a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1])}
+function initDate(){$('examDate').value=new Date().toISOString().slice(0,10)}
+
+const epiQuestions=[  "Часто ли вы испытываете тягу к новым впечатлениям, к тому, чтобы встряхнуться, испытать возбуждение?",  "Часто ли нуждаетесь в друзьях, которые вас понимают, могут ободрить, утешить?",  "Вы верите в удачу, считая себя везучим человеком?",  "Находите ли вы, что вам трудно ответить «нет»?",  "Задумываетесь ли вы перед тем, как что-нибудь предпринять?",  "Если вы обещаете что-нибудь сделать, всегда ли сдерживаете свои обещания независимо от того, удобно это вам или нет?",  "Часто ли у вас бывают спады и подъемы настроения?",  "Всегда вы поступаете и говорите быстро, не раздумывая?",  "Часто ли вы чувствуете себя несчастным человеком без достаточных на это причин?",  "Вам интересно заключать пари, спорить на что-нибудь?",  "Вам трудно скрыть волнение, когда вы разговариваете со значимым для вас человеком?",  "Вы злились когда-нибудь на своих знакомых, если им удавалось вас обойти?",  "Вам часто кажутся странными люди, которые своей серьезностью и осторожностью наводят на окружающих тоску?",  "Часто ли вы беспокоитесь из-за того, что сделали или сказали такое, чего не следовало бы говорить?",  "Предпочитаете ли вы обычно книги встречам с людьми?",  "Легко ли вас обидеть?",  "Любите ли вы часто бывать в компании?",  "Бывают ли у вас иногда мысли, которые вы хотели бы скрыть от окружающих?",  "У вас бывали периоды, когда вы без серьезных причин чувствовали себя несчастным человеком?",  "Путешествуя, вы охотнее любуетесь пейзажами, чем беседуете с людьми?",  "Часто ли вы мечтаете?",  "Когда на вас кричат, вы отвечаете тем же?",  "Часто ли вас беспокоит чувство вины?",  "Вы всегда готовы прийти на помощь нуждающемуся человеку?",  "Способны ли вы дать волю своим чувствам и вовсю повеселиться в компании?",  "Считаете ли вы себя человеком возбудимым и чувствительным?",  "Считаете ли себя человеком живым и веселым?",  "Часто ли, сделав какое-нибудь важное дело, вы испытываете чувство, что могли бы сделать его лучше?",  "Вы больше молчите, когда находитесь в обществе других людей?",  "Иногда вы сплетничаете?",  "Бывает ли, что вам не спится из-за того, что разные мысли лезут вам в голову?",  "Если вы хотите узнать о чем-либо, то вы предпочитаете узнать об этом в книге, нежели спросить?",  "Вам бывает трудно заснуть из-за беспокойства по поводу неудачи?",  "Нравится ли вам работа, которая требует от вас постоянного внимания?",  "Бывают ли у вас приступы дрожи?",  "Всегда ли вы платили бы за провоз багажа на транспорте, если бы не опасались проверки?",  "Вам неприятно находиться в обществе, где подшучивают друг над другом?",  "Раздражительны ли вы?",  "Нравится ли вам работа, которая требует быстроты действий?",  "Волнуетесь ли вы по поводу каких-то неприятностей, которые могли бы произойти?",  "Вы ходите медленно и неторопливо?",  "Вы когда-нибудь опаздывали на свидание или на работу?",  "Часто ли вам снятся кошмары?",  "Верно ли, что вы любите поговорить, что никогда не упустите случая побеседовать с незнакомым человеком?",  "Беспокоят ли вас какие-нибудь боли?",  "Вы бы чувствовали себя очень несчастным, если бы длительное время были бы лишены широкого общения с людьми?",  "Можете ли вы назвать себя нервным человеком?",  "Не во всех делах вы стремитесь добиваться полезного для людей результата?",  "Вас ценят в компании как веселого и изобретательного человека?",  "Легко ли вы обижаетесь, когда люди указывают на ваши ошибки в работе или промахи?",  "Вы считаете, что трудно получить настоящее удовольствие от вечеринки?",  "Беспокоит ли вас чувство, что вы чем-то хуже других?",  "Легко ли вам внести оживление в довольно скучную компанию?",  "Бывает ли, что вы говорите о вещах, в которых не разбираетесь?",  "Вас беспокоит чувство вины или угрызения совести даже из-за пустяков?",  "Любите ли вы подшучивать над другими?",  "Страдаете ли вы от бессонницы?"];
+const staiQuestions=[  "Я спокоен.",  "Мне ничто не угрожает.",  "Я нахожусь в напряжении.",  "Я испытываю сожаление.",  "Я чувствую себя свободно.",  "Я расстроен.",  "Меня волнуют возможные неудачи.",  "Я чувствую себя отдохнувшим.",  "Я встревожен.",  "Я испытываю чувство внутреннего удовлетворения.",  "Я уверен в себе.",  "Я нервничаю.",  "Я не нахожу себе места.",  "Я взвинчен.",  "Я не чувствую скованности, напряженности.",  "Я доволен.",  "Я озабочен.",  "Я слишком возбуждён и мне не по себе.",  "Мне радостно.",  "Мне приятно.",  "Я обычно испытываю удовольствие.",  "Я обычно быстро устаю.",  "Как правило, я легко могу заплакать.",  "Я хотел бы быть таким же счастливым, как другие.",  "Нередко я проигрываю из-за того, что недостаточно быстро принимаю решения.",  "Обычно я чувствую себя бодрым.",  "Обычно я спокоен, хладнокровен и собран.",  "Ожидаемые трудности обычно меня очень тревожат.",  "Я слишком переживаю из-за пустяков.",  "Я вполне счастлив.",  "Я принимаю всё слишком близко к сердцу.",  "Мне не хватает уверенности в себе.",  "Обычно я чувствую себя в безопасности.",  "Я стараюсь избегать критических ситуаций и трудностей.",  "У меня бывает хандра.",  "Как правило, я доволен.",  "Всякие пустяки отвлекают и волнуют меня.",  "Я так сильно переживаю свои разочарования, что потом долго не могу о них забыть.",  "Я уравновешенный человек.",  "Меня охватывает сильное беспокойство, когда я думаю о своих делах и заботах."];
+const epiAnswers=Array(57).fill(null);
+const staiAnswers=Array(40).fill(null);
+const epiKey={extraYes:[1,3,8,10,13,17,22,25,27,39,44,46,49,53,56],extraNo:[5,15,20,29,32,34,37,41,51],neuroYes:[2,4,7,9,11,14,16,19,21,23,26,28,31,33,35,38,40,43,45,47,50,52,55,57],lieYes:[6,24,36],lieNo:[12,18,30,42,48,54]};
+const staiKey={stateDirect:[3,4,6,7,9,12,13,14,17,18],stateReverse:[1,2,5,8,10,11,15,16,19,20],traitDirect:[22,23,24,25,28,29,31,32,34,35,37,38,40],traitReverse:[21,26,27,30,33,36,39]};
+function countKey(list, answers, expected){return list.reduce((s,n)=>s+(answers[n-1]===expected?1:0),0)}
+function staiScore(direct, reverse){return direct.reduce((s,n)=>s+(staiAnswers[n-1]||0),0)+reverse.reduce((s,n)=>s+(5-(staiAnswers[n-1]||0)),0)}
+function anxietyLevel(score){return score<=30?1:score<=40?2:score<=44?3:score<=50?4:5}
+function stabilityLevel(neuro){return neuro<=6?5:neuro<=11?4:neuro<=16?3:neuro<=20?2:1}
+function impulseFromEpi(lie, neuro){let base=5-Math.min(4,Math.floor(neuro/6)); if(lie>=5)base=Math.max(1,base-1); return base}
+function calcQuestionnaires(){let extra=countKey(epiKey.extraYes,epiAnswers,1)+countKey(epiKey.extraNo,epiAnswers,2);let neuro=countKey(epiKey.neuroYes,epiAnswers,1);let lie=countKey(epiKey.lieYes,epiAnswers,1)+countKey(epiKey.lieNo,epiAnswers,2);let state=staiScore(staiKey.stateDirect,staiKey.stateReverse);let trait=staiScore(staiKey.traitDirect,staiKey.traitReverse);return{epi:{extraversion:extra,neuroticism:neuro,lie,emotionalStabilityLevel:stabilityLevel(neuro),impulseControlLevel:impulseFromEpi(lie,neuro)},stai:{stateAnxiety:state,traitAnxiety:trait,stateLevel:anxietyLevel(state),traitLevel:anxietyLevel(trait)}}}
+function renderQuestionnaires(){renderEpi();renderStai();updateQuestionnaires()}
+function renderEpi(){let box=$('epiBox');box.innerHTML='';epiQuestions.forEach((q,i)=>{let d=document.createElement('div');d.className='qcard';d.innerHTML=`<div class="qtext">${i+1}. ${q}</div><div class="answers two"><button class="ans" onclick="setEpi(${i},1,this)">Да</button><button class="ans" onclick="setEpi(${i},2,this)">Нет</button></div>`;box.appendChild(d)})}
+function renderStai(){let box=$('staiBox');box.innerHTML='';staiQuestions.forEach((q,i)=>{let opts=i<20?['Нет, это не так','Пожалуй, так','Верно','Совершенно верно']:['Почти никогда','Иногда','Часто','Почти всегда'];let d=document.createElement('div');d.className='qcard';d.innerHTML=`<div class="qtext">${i+1}. ${q}</div><div class="answers">${opts.map((o,j)=>`<button class="ans" onclick="setStai(${i},${j+1},this)">${o}</button>`).join('')}</div>`;box.appendChild(d)})}
+function setEpi(i,v,btn){epiAnswers[i]=v;btn.parentElement.querySelectorAll('.ans').forEach(b=>b.classList.remove('active'));btn.classList.add('active');updateQuestionnaires()}
+function setStai(i,v,btn){staiAnswers[i]=v;btn.parentElement.querySelectorAll('.ans').forEach(b=>b.classList.remove('active'));btn.classList.add('active');updateQuestionnaires()}
+function showQuestionnaire(kind){$('epiBox').style.display=kind==='epi'?'grid':'none';$('staiBox').style.display=kind==='stai'?'grid':'none';$('tabEpi').classList.toggle('active',kind==='epi');$('tabStai').classList.toggle('active',kind==='stai')}
+function updateQuestionnaires(){let filled=epiAnswers.filter(Boolean).length+staiAnswers.filter(Boolean).length;$('questionnaireStatus').textContent=`Заполнено: ${filled} из 97`;let ready=filled===97;$('questionnaireNextBtn').disabled=!ready;if(ready){let r=calcQuestionnaires();$('questionnaireResult').textContent=`EPI N=${r.epi.neuroticism}, STAI S=${r.stai.stateAnxiety}, T=${r.stai.traitAnxiety}`;$('questionnaireSummary').innerHTML=`<table><tr><th>Шкала</th><th>Сырой балл</th><th>Уровень 1-5</th></tr><tr><td>Эмоциональная устойчивость EPI</td><td>Нейротизм: ${r.epi.neuroticism}</td><td>${r.epi.emotionalStabilityLevel}</td></tr><tr><td>Ситуативная тревожность STAI</td><td>${r.stai.stateAnxiety}</td><td>${r.stai.stateLevel}</td></tr><tr><td>Личностная тревожность STAI</td><td>${r.stai.traitAnxiety}</td><td>${r.stai.traitLevel}</td></tr><tr><td>Контроль импульсивности</td><td>EPI N=${r.epi.neuroticism}, L=${r.epi.lie}</td><td>${r.epi.impulseControlLevel}</td></tr></table>`}else{$('questionnaireResult').textContent='Результаты появятся после заполнения';$('questionnaireSummary').innerHTML=''}}
+function finishQuestionnaires(){if(epiAnswers.filter(Boolean).length+staiAnswers.filter(Boolean).length!==97)return;results.tasks.questionnaires=calcQuestionnaires();markDone('questionnaires');next()}
+
+let schulte={next:1,start:0,errors:0,tick:null,running:false};
+function resetSchulte(){clearInterval(schulte.tick);schulte={next:1,start:0,errors:0,tick:null,running:false};delete results.tasks.schulte;delete done.schulte;updateProgress();$('schulteNextBtn').disabled=true;$('schulteNext').textContent='1';$('schulteErrors').textContent='0';$('schulteTime').textContent='0.0';$('schulteGrid').innerHTML='<div class="sub" style="grid-column:1/-1">Нажмите «Начать». Секундомер запустится в момент появления таблицы.</div>'}
+function startSchulte(){clearInterval(schulte.tick);delete results.tasks.schulte;delete done.schulte;updateProgress();schulte={next:1,start:0,errors:0,tick:null,running:true};$('schulteNextBtn').disabled=true;$('schulteNext').textContent='1';$('schulteErrors').textContent='0';$('schulteTime').textContent='0.0';let nums=shuffle([...Array(25)].map((_,i)=>i+1));$('schulteGrid').innerHTML='';nums.forEach(num=>{let c=document.createElement('button');c.className='cell';c.textContent=num;c.onclick=()=>clickSchulte(c,num);$('schulteGrid').appendChild(c)});schulte.start=performance.now();schulte.tick=setInterval(()=>{$('schulteTime').textContent=((performance.now()-schulte.start)/1000).toFixed(1)},100)}
+function clickSchulte(c,num){if(!schulte.running||c.classList.contains('done'))return;let now=performance.now();if(num===schulte.next){c.classList.add('done');schulte.next++;$('schulteNext').textContent=schulte.next<=25?schulte.next:'Готово';if(schulte.next>25){schulte.running=false;clearInterval(schulte.tick);let sec=(now-schulte.start)/1000;$('schulteTime').textContent=sec.toFixed(1);results.tasks.schulte={seconds:Math.round(sec*1000)/1000,errors:schulte.errors,level:Math.max(1,levelByTime(sec,[35,45,60,75])-Math.min(2,schulte.errors))};markDone('schulte');$('schulteNextBtn').disabled=false}}else{schulte.errors++;$('schulteErrors').textContent=schulte.errors}}
+
+let bourdon={letters:[],left:90,tick:null,started:false};
+function startBourdon(){clearInterval(bourdon.tick);let alphabet='АВЕКМНОРСТХ';bourdon={letters:[],left:90,tick:null,started:true};$('bourdonNextBtn').disabled=true;$('bourdonGrid').innerHTML='';for(let i=0;i<500;i++){let ch=alphabet[Math.floor(Math.random()*alphabet.length)];bourdon.letters.push({ch,sel:false});let b=document.createElement('button');b.className='letter';b.textContent=ch;b.onclick=()=>{if(!bourdon.started)return;bourdon.letters[i].sel=!bourdon.letters[i].sel;b.classList.toggle('sel');updateBourdon()};$('bourdonGrid').appendChild(b)}updateBourdon();bourdon.tick=setInterval(()=>{bourdon.left--;$('bourdonLeft').textContent=bourdon.left;if(bourdon.left<=0)finishBourdon()},1000)}
+function updateBourdon(){let selected=bourdon.letters.filter(x=>x.sel).length;$('bourdonSelected').textContent=selected;let targets=bourdon.letters.filter(x=>x.ch==='К'||x.ch==='Р');let hit=targets.filter(x=>x.sel).length;let wrong=bourdon.letters.filter(x=>x.sel&&x.ch!=='К'&&x.ch!=='Р').length;let acc=selected?Math.max(0,Math.round(hit/selected*100)):0;$('bourdonAcc').textContent=selected?acc+'%':'-';return{targets,hit,wrong,miss:targets.length-hit,acc}}
+function finishBourdon(){clearInterval(bourdon.tick);bourdon.started=false;let r=updateBourdon();document.querySelectorAll('.letter').forEach((el,i)=>{let x=bourdon.letters[i];if((x.ch==='К'||x.ch==='Р')&&!x.sel)el.classList.add('miss');if(x.sel&&x.ch!=='К'&&x.ch!=='Р')el.classList.add('wrong')});let quality=Math.max(0,r.acc-r.wrong*2-r.miss);let level=quality>=90?5:quality>=80?4:quality>=65?3:quality>=50?2:1;results.tasks.bourdon={targets:r.targets.length,hit:r.hit,wrong:r.wrong,miss:r.miss,accuracy:r.acc,level};markDone('bourdon');$('bourdonNextBtn').disabled=false}
+
+let gorbov={seq:[],pos:0,start:0,errors:0,tick:null,running:false};
+function resetGorbov(){clearInterval(gorbov.tick);gorbov={seq:[],pos:0,start:0,errors:0,tick:null,running:false};delete results.tasks.gorbov;delete done.gorbov;updateProgress();$('gorbovNextBtn').disabled=true;$('gorbovNext').textContent='-';$('gorbovErrors').textContent='0';$('gorbovTime').textContent='0.0';$('gorbovGrid').innerHTML='<div class="sub" style="grid-column:1/-1">Нажмите «Начать». Секундомер запустится в момент появления таблицы.</div>'}
+function startGorbov(){clearInterval(gorbov.tick);delete results.tasks.gorbov;delete done.gorbov;updateProgress();gorbov={seq:[],pos:0,start:0,errors:0,tick:null,running:true};$('gorbovTime').textContent='0.0';for(let i=1;i<=24;i++){gorbov.seq.push({num:i,color:'black'});gorbov.seq.push({num:25-i,color:'red'})}gorbov.seq.push({num:25,color:'black'});$('gorbovNextBtn').disabled=true;$('gorbovErrors').textContent='0';let cells=[];for(let i=1;i<=25;i++)cells.push({num:i,color:'black'});for(let i=1;i<=24;i++)cells.push({num:i,color:'red'});$('gorbovGrid').innerHTML='';shuffle(cells).forEach(item=>{let b=document.createElement('button');b.className='cell '+item.color;b.textContent=item.num;b.onclick=()=>clickGorbov(b,item);$('gorbovGrid').appendChild(b)});setGorbovNext();gorbov.start=performance.now();gorbov.tick=setInterval(()=>{$('gorbovTime').textContent=((performance.now()-gorbov.start)/1000).toFixed(1)},100)}
+function setGorbovNext(){let n=gorbov.seq[gorbov.pos];$('gorbovNext').textContent=n?n.num+' '+(n.color==='red'?'красн.':'черн.'):'Готово'}
+function clickGorbov(b,item){if(!gorbov.running||b.classList.contains('done'))return;let now=performance.now();let n=gorbov.seq[gorbov.pos];if(n&&item.num===n.num&&item.color===n.color){b.classList.add('done');gorbov.pos++;setGorbovNext();if(gorbov.pos>=gorbov.seq.length){gorbov.running=false;clearInterval(gorbov.tick);let sec=(now-gorbov.start)/1000;$('gorbovTime').textContent=sec.toFixed(1);results.tasks.gorbov={seconds:Math.round(sec*1000)/1000,errors:gorbov.errors,level:Math.max(1,levelByTime(sec,[80,105,135,170])-Math.min(2,gorbov.errors))};markDone('gorbov');$('gorbovNextBtn').disabled=false}}else{gorbov.errors++;$('gorbovErrors').textContent=gorbov.errors}}
+
+let react={trial:0,falseStarts:0,times:[],ready:false,timer:null,signalAt:0,active:false};
+function startReaction(){clearTimeout(react.timer);react={trial:0,falseStarts:0,times:[],ready:false,timer:null,signalAt:0,active:true};$('reactionNextBtn').disabled=true;nextReaction()}
+function nextReaction(){react.ready=false;$('signal').className='signal wait';$('signal').textContent='Ждите сигнал';$('reactionTrial').textContent=react.trial+'/20';let delay=800+Math.random()*1800;react.timer=setTimeout(()=>{react.ready=true;react.signalAt=performance.now();$('signal').className='signal go';$('signal').textContent='Нажмите сейчас'},delay)}
+$('signal').onclick=()=>{if(!react.active)return;if(!react.ready){react.falseStarts++;$('reactionFalse').textContent=react.falseStarts;return}let t=performance.now()-react.signalAt;react.times.push(t);react.trial++;let mean=Math.round(react.times.reduce((a,b)=>a+b,0)/react.times.length);$('reactionMean').textContent=mean+' мс';if(react.trial>=20){react.active=false;$('signal').className='signal wait';$('signal').textContent='Тест завершен';let level=mean<=260?5:mean<=330?4:mean<=430?3:mean<=550?2:1;let control=Math.max(1,5-react.falseStarts);results.tasks.reaction={meanMs:mean,falseStarts:react.falseStarts,level,impulseControlLevel:control};markDone('reaction');$('reactionNextBtn').disabled=false}else nextReaction()}
+
+function data(){let r=results.tasks.reaction||{};let q=results.tasks.questionnaires||calcQuestionnaires();let impulse=Math.min(q.epi.impulseControlLevel||3,r.impulseControlLevel||5);return{version:'2.1',type:'uav_diagnostics_result',createdAt:new Date().toISOString(),candidate:{name:$('candidateName').value,date:$('examDate').value,age:$('age').value,group:$('group').value,experience:$('experience').value,uavExperience:$('uavExperience').value},standardized:{emotionalStability:q.epi.emotionalStabilityLevel||3,situationalAnxiety:q.stai.stateLevel||3,traitAnxiety:q.stai.traitLevel||3,concentration:results.tasks.schulte?.level||3,attentionStability:results.tasks.bourdon?.level||3,attentionSwitching:results.tasks.gorbov?.level||3,reactionSpeed:r.level||3,impulseControl:impulse},raw:results.tasks,completed:Object.keys(done),sources:{epi:'https://psytests.org/eysenck/epiAS.html',stai:'https://psytests.org/anxiety/stai.html'}}}
+function renderSummary(){let d=data();$('summary').innerHTML='<table><tr><th>Показатель</th><th>Уровень 1-5</th></tr>'+Object.entries(d.standardized).map(([k,v])=>'<tr><td>'+labels[k]+'</td><td>'+v+'</td></tr>').join('')+'</table><p class="notice">Если какой-то блок не завершен, в файл попадет средний уровень 3. Лучше завершить все задания перед сохранением.</p>'}
+const labels={emotionalStability:'Эмоциональная устойчивость',situationalAnxiety:'Ситуативная тревожность',traitAnxiety:'Личностная тревожность',concentration:'Концентрация внимания',attentionStability:'Устойчивость внимания',attentionSwitching:'Переключение внимания',reactionSpeed:'Скорость сенсомоторной реакции',impulseControl:'Контроль импульсивности'};
+function saveResults(){let d=data();let blob=new Blob([JSON.stringify(d,null,2)],{type:'application/json;charset=utf-8'});let a=document.createElement('a');let name=(d.candidate.name||'candidate').replace(/[^\wа-яА-Я-]+/g,'_');a.href=URL.createObjectURL(blob);a.download='result_'+name+'_'+(d.candidate.date||'date')+'.json';a.click();URL.revokeObjectURL(a.href)}
+renderNav();initDate();renderQuestionnaires();resetSchulte();resetGorbov();
+</script>
+</body>
+</html>
