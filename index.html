@@ -94,7 +94,8 @@
       <h2>7. Сохранение файла результатов</h2>
       <p>Проверьте сводку и сохраните файл. Этот файл затем выбирает психолог во второй программе для формирования заключения.</p>
       <div id="summary"></div>
-      <div class="actions"><button onclick="saveResults()">Сохранить файл результатов</button><button class="secondary" onclick="prev()">Назад</button></div>
+      <div id="saveStatus" class="notice" style="display:none"></div>
+      <div class="actions"><button id="saveBtn" onclick="saveResults()">Сохранить и отправить результаты</button><button class="secondary" onclick="prev()">Назад</button></div>
     </section>
   </div>
 </main>
@@ -158,7 +159,25 @@ $('signal').onclick=()=>{if(!react.active)return;if(!react.ready){react.falseSta
 function data(){let r=results.tasks.reaction||{};let q=results.tasks.questionnaires||calcQuestionnaires();let impulse=Math.min(q.epi.impulseControlLevel||3,r.impulseControlLevel||5);return{version:'2.1',type:'uav_diagnostics_result',createdAt:new Date().toISOString(),candidate:{name:$('candidateName').value,date:$('examDate').value,age:$('age').value,group:$('group').value,experience:$('experience').value,uavExperience:$('uavExperience').value},standardized:{emotionalStability:q.epi.emotionalStabilityLevel||3,situationalAnxiety:q.stai.stateLevel||3,traitAnxiety:q.stai.traitLevel||3,concentration:results.tasks.schulte?.level||3,attentionStability:results.tasks.bourdon?.level||3,attentionSwitching:results.tasks.gorbov?.level||3,reactionSpeed:r.level||3,impulseControl:impulse},raw:results.tasks,completed:Object.keys(done),sources:{epi:'https://psytests.org/eysenck/epiAS.html',stai:'https://psytests.org/anxiety/stai.html'}}}
 function renderSummary(){let d=data();$('summary').innerHTML='<table><tr><th>Показатель</th><th>Уровень 1-5</th></tr>'+Object.entries(d.standardized).map(([k,v])=>'<tr><td>'+labels[k]+'</td><td>'+v+'</td></tr>').join('')+'</table><p class="notice">Если какой-то блок не завершен, в файл попадет средний уровень 3. Лучше завершить все задания перед сохранением.</p>'}
 const labels={emotionalStability:'Эмоциональная устойчивость',situationalAnxiety:'Ситуативная тревожность',traitAnxiety:'Личностная тревожность',concentration:'Концентрация внимания',attentionStability:'Устойчивость внимания',attentionSwitching:'Переключение внимания',reactionSpeed:'Скорость сенсомоторной реакции',impulseControl:'Контроль импульсивности'};
-function saveResults(){let d=data();let blob=new Blob([JSON.stringify(d,null,2)],{type:'application/json;charset=utf-8'});let a=document.createElement('a');let name=(d.candidate.name||'candidate').replace(/[^\wа-яА-Я-]+/g,'_');a.href=URL.createObjectURL(blob);a.download='result_'+name+'_'+(d.candidate.date||'date')+'.json';a.click();URL.revokeObjectURL(a.href)}
+// === Отправка результатов ===
+// Вставьте сюда URL веб-приложения Google Apps Script и ту же секретную строку, что в скрипте.
+const UPLOAD_URL='https://script.google.com/macros/s/AKfycbw-V7L5eT6tOr9XKSt0ikkQ91HZiAhgN_qMmYlRCYxMaz4PjvF8-pAjQOxDyMNfF_G3cA/exec';
+const UPLOAD_TOKEN='MATmat007';
+function setSaveStatus(msg,cls){let el=$('saveStatus');el.className='notice '+(cls||'');el.textContent=msg;el.style.display='block'}
+function downloadLocal(d){let blob=new Blob([JSON.stringify(d,null,2)],{type:'application/json;charset=utf-8'});let a=document.createElement('a');let name=(d.candidate.name||'candidate').replace(/[^\wа-яА-Я-]+/g,'_');a.href=URL.createObjectURL(blob);a.download='result_'+name+'_'+(d.candidate.date||'date')+'.json';a.click();URL.revokeObjectURL(a.href)}
+async function saveResults(){
+  let btn=$('saveBtn');let d=data();
+  downloadLocal(d);
+  if(!UPLOAD_URL){setSaveStatus('Файл сохранён на это устройство. Отправка не настроена: передайте файл психологу вручную.','bad');return}
+  btn.disabled=true;setSaveStatus('Отправка результатов...','');
+  try{
+    let r=await fetch(UPLOAD_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({...d,token:UPLOAD_TOKEN})});
+    let j=await r.json();
+    if(j&&j.ok){setSaveStatus('Результаты отправлены. Копия файла также сохранена на устройстве.','ok')}
+    else{throw new Error('bad response')}
+  }catch(e){setSaveStatus('Не удалось подтвердить отправку. Файл сохранён на устройстве, передайте его психологу вручную.','bad')}
+  btn.disabled=false;
+}
 renderNav();initDate();renderQuestionnaires();resetSchulte();resetGorbov();
 </script>
 </body>
