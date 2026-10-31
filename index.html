@@ -96,6 +96,16 @@
       <div id="summary"></div>
       <div id="saveStatus" class="notice" style="display:none"></div>
       <div class="actions"><button id="saveBtn" onclick="saveResults()">Сохранить и отправить результаты</button><button class="secondary" onclick="prev()">Назад</button></div>
+      <div class="card" style="margin-top:18px">
+        <strong>Если автоматическая отправка не сработала</strong>
+        <p class="sub" style="margin:6px 0 0">Отправьте результаты вручную любым из способов ниже.</p>
+        <div class="actions">
+          <button class="secondary" onclick="shareResults()">Поделиться файлом</button>
+          <button class="secondary" onclick="mailResults()">Написать письмо</button>
+          <button class="ghost" onclick="copyResults()">Скопировать результаты</button>
+        </div>
+        <p class="sub" style="margin:8px 0 0">«Поделиться файлом» открывает меню устройства (Почта, Telegram, Файлы и др.). Выберите получателя и отправьте файл. «Написать письмо» открывает почтовое приложение с результатами в тексте письма.</p>
+      </div>
     </section>
   </div>
 </main>
@@ -177,6 +187,29 @@ async function saveResults(){
     else{throw new Error('bad response')}
   }catch(e){setSaveStatus('Не удалось подтвердить отправку. Файл сохранён на устройстве, передайте его психологу вручную.','bad')}
   btn.disabled=false;
+}
+// === Ручная отправка ===
+// Адрес, на который открывается письмо кнопкой «Написать письмо». Виден в коде страницы.
+const MANUAL_EMAIL='putilinmatvey@gmail.com';
+function resultFileName(d){let n=(d.candidate.name||'candidate').replace(/[^\wа-яА-ЯёЁ-]+/g,'_');return 'result_'+n+'_'+(d.candidate.date||'date')+'.json'}
+async function shareResults(){
+  let d=data(),json=JSON.stringify(d,null,2),name=resultFileName(d);
+  let file=new File([json],name,{type:'application/json'});
+  if(!(navigator.canShare&&navigator.canShare({files:[file]}))){file=new File([json],name,{type:'text/plain'})}
+  if(navigator.canShare&&navigator.canShare({files:[file]})){
+    try{await navigator.share({files:[file],title:'Результаты методик: '+(d.candidate.name||'без имени')});setSaveStatus('Меню отправки открыто. Убедитесь, что файл отправлен выбранным способом.','ok')}
+    catch(e){if(e&&e.name!=='AbortError')setSaveStatus('Не удалось открыть меню отправки. Воспользуйтесь кнопкой «Написать письмо» или «Скопировать результаты».','bad')}
+  }else{setSaveStatus('Это устройство не поддерживает отправку файла из браузера. Воспользуйтесь кнопкой «Написать письмо» или «Скопировать результаты».','bad')}
+}
+function mailResults(){
+  let d=data(),subject='Результаты методик: '+(d.candidate.name||'без имени');
+  let body='Результаты прохождения методик (JSON):\n\n'+JSON.stringify(d);
+  location.href='mailto:'+MANUAL_EMAIL+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+}
+async function copyResults(){
+  let text=JSON.stringify(data(),null,2);
+  try{await navigator.clipboard.writeText(text);setSaveStatus('Результаты скопированы. Вставьте их в письмо или сообщение.','ok')}
+  catch(e){let ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');setSaveStatus('Результаты скопированы. Вставьте их в письмо или сообщение.','ok')}catch(e2){setSaveStatus('Не удалось скопировать. Используйте «Поделиться файлом».','bad')}document.body.removeChild(ta)}
 }
 renderNav();initDate();renderQuestionnaires();resetSchulte();resetGorbov();
 </script>
